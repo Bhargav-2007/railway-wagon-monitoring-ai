@@ -1,0 +1,112 @@
+"""
+FastAPI main application
+"""
+from fastapi import FastAPI, Request
+from fastapi.middleware.cors import CORSMiddleware
+from fastapi.responses import JSONResponse
+from contextlib import asynccontextmanager
+import time
+import sys
+from pathlib import Path
+
+# Add project root to path
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root))
+
+from backend.app.core.config import settings
+from backend.app.db.session import init_db
+from backend.app.api import health, frames, analytics
+
+# Startup time for uptime calculation
+startup_time = time.time()
+
+
+@asynccontextmanager
+async def lifespan(app: FastAPI):
+    """Startup and shutdown events"""
+    # Startup
+    print("Starting Railway Monitoring System...")
+    init_db()
+    print("✓ Database initialized")
+    yield
+    # Shutdown
+    print("Shutting down...")
+
+
+# Create FastAPI app
+app = FastAPI(
+    title=settings.PROJECT_NAME,
+    version=settings.VERSION,
+    description=settings.DESCRIPTION,
+    lifespan=lifespan
+)
+
+# CORS middleware
+app.add_middleware(
+    CORSMiddleware,
+    allow_origins=settings.BACKEND_CORS_ORIGINS,
+    allow_credentials=True,
+    allow_methods=["*"],
+    allow_headers=["*"],
+)
+
+
+# Request timing middleware
+@app.middleware("http")
+async def add_process_time_header(request: Request, call_next):
+    start_time = time.time()
+    response = await call_next(request)
+    process_time = time.time() - start_time
+    response.headers["X-Process-Time"] = str(process_time)
+    return response
+
+
+# Include routers
+app.include_router(health.router, prefix=f"{settings.API_V1_STR}/health", tags=["Health"])
+app.include_router(frames.router, prefix=f"{settings.API_V1_STR}/frames", tags=["Frames"])
+app.include_router(analytics.router, prefix=f"{settings.API_V1_STR}/analytics", tags=["Analytics"])
+
+
+# Root endpoint
+@app.get("/")
+async def root():
+    """Root endpoint"""
+    return {
+        "name": settings.PROJECT_NAME,
+        "version": settings.VERSION,
+        "status": "online",
+        "docs": "/docs"
+    }
+
+
+# Global exception handler
+@app.exception_handler(Exception)
+async def global_exception_handler(request: Request, exc: Exception):
+    return JSONResponse(
+        status_code=500,
+        content={
+            "error": "Internal server error",
+            "detail": str(exc),
+            "path": str(request.url)
+        }
+    )
+
+
+if __name__ == "__main__":
+    import uvicorn
+    uvicorn.run(
+        "main:app",
+        host="0.0.0.0",
+        port=8000,
+        reload=True
+    )
+
+# Import stream router
+
+# Import and register stream router
+try:
+    from app.api.v1.stream import router as stream_router
+    app.include_router(stream_router, prefix="/api/v1/stream", tags=["streaming"])
+    print("✓ Streaming API registered")
+except Exception as e:
+    print(f"⚠ Streaming API not available: {e}")

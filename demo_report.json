@@ -1,0 +1,21 @@
+{
+  "timestamp": "2026-01-03T16:24:46.931247",
+  "summary": {
+    "total_images": 1,
+    "blurred_count": 0,
+    "total_wagons": 2,
+    "avg_processing_time": 0.28067946434020996,
+    "avg_fps": 3.5627829144917627
+  },
+  "details": [
+    {
+      "image": "test_frame_captured.jpg",
+      "blur_detected": false,
+      "blur_score": 89.91122169157931,
+      "wagons": 2,
+      "wagon_ids": [],
+      "processing_time": 0.28067946434020996,
+      "fps": 3.5627829144917627
+    }
+  ]
+}

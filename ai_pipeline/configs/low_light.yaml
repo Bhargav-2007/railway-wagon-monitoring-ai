@@ -1,0 +1,22 @@
+model:
+  architecture: "zero_dce"
+  num_iterations: 8
+  filters: 32
+  checkpoint_path: "ai_pipeline/low_light_enhancement/models/zero_dce.pth"
+
+training:
+  epochs: 100
+  batch_size: 8
+  learning_rate: 0.0001
+  patch_size: 256
+
+loss:
+  spatial_consistency_weight: 1.0
+  exposure_control_weight: 10.0
+  color_constancy_weight: 5.0
+  illumination_smoothness_weight: 200.0
+
+inference:
+  auto_detect_low_light: true
+  brightness_threshold: 50
+  apply_gamma_correction: true

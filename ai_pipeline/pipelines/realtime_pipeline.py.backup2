@@ -1,0 +1,144 @@
+import cv2
+import numpy as np
+import time
+import sys
+import os
+from typing import Dict, Optional, List
+
+# Add parent directory to path
+sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
+
+# Try to import PyTorch-based modules (optional)
+try:
+    from ai_pipeline.blur_detection.infer import BlurDetectionInference
+    TORCH_AVAILABLE = True
+except ImportError:
+    TORCH_AVAILABLE = False
+    print("⚠ PyTorch not available, using classical methods only")
+
+# Always import classical methods (no dependencies)
+from ai_pipeline.modules.blur_detection import BlurDetector
+from ai_pipeline.modules.wagon_detection import WagonDetector
+from ai_pipeline.modules.wagon_tracker import WagonTracker
+
+class RailwayMonitoringPipeline:
+    def __init__(self, blur_threshold: float = 100.0, use_cnn: bool = False):
+        """
+        Initialize the pipeline
+        
+        Args:
+            blur_threshold: Threshold for blur detection (higher = more sensitive)
+            use_cnn: Use CNN model if available (requires PyTorch)
+        """
+        print("\nInitializing Railway Monitoring Pipeline...\n")
+        
+        self.blur_threshold = blur_threshold
+        self.use_cnn = use_cnn and TORCH_AVAILABLE
+        
+        # Initialize blur detector (classical method - always available)
+        self.blur_detector = BlurDetector(threshold=blur_threshold)
+        print(f"  ✓ Blur detector (threshold: {blur_threshold})")
+        
+        # Initialize wagon detector
+        self.wagon_detector = WagonDetector()
+        print("  ✓ Wagon detector")
+        
+        # Initialize wagon tracker
+        self.wagon_tracker = WagonTracker()
+        print("  ✓ Wagon tracker")
+        
+        # Try to load CNN model if requested
+        if self.use_cnn and TORCH_AVAILABLE:
+            try:
+                self.cnn_blur_detector = BlurDetectionInference()
+                print("  ✓ CNN blur detector loaded")
+            except Exception as e:
+                print(f"  ⚠ CNN model not available: {e}")
+                self.use_cnn = False
+        
+        print("\n✓ Pipeline initialized\n")
+    
+    def process_frame(self, frame: np.ndarray, camera_id: str = "default") -> Dict:
+        """
+        Process a single frame through the complete pipeline
+        
+        Args:
+            frame: Input image (BGR format)
+            camera_id: Camera identifier
+            
+        Returns:
+            Dictionary with all processing results
+        """
+        start_time = time.time()
+        
+        # 1. Blur Detection
+        blur_result = self.blur_detector.detect_blur(frame)
+        is_blurred = blur_result['is_blurred']
+        blur_score = blur_result['blur_score']
+        
+        # 2. Wagon Detection
+        wagons = self.wagon_detector.detect_wagons(frame)
+        num_wagons = len(wagons)
+        
+        # 3. Wagon Tracking
+        tracked_wagons = self.wagon_tracker.update(wagons, camera_id)
+        
+        # 4. Extract wagon IDs (from tracking)
+        wagon_ids = [w.get('wagon_id', '') for w in tracked_wagons if w.get('wagon_id')]
+        
+        # 5. Create visualization
+        vis_frame = frame.copy()
+        
+        # Draw blur status
+        color = (0, 0, 255) if is_blurred else (0, 255, 0)
+        status_text = f"BLURRED (Score: {blur_score:.1f})" if is_blurred else f"SHARP (Score: {blur_score:.1f})"
+        cv2.putText(vis_frame, status_text, (10, 30), 
+                   cv2.FONT_HERSHEY_SIMPLEX, 1, color, 2)
+        
+        # Draw wagon bounding boxes
+        for i, wagon in enumerate(wagons):
+            x, y, w, h = wagon['bbox']
+            cv2.rectangle(vis_frame, (x, y), (x+w, y+h), (255, 0, 0), 2)
+            
+            # Add wagon number
+            label = f"Wagon {i+1}"
+            if i < len(wagon_ids) and wagon_ids[i]:
+                label += f": {wagon_ids[i]}"
+            
+            cv2.putText(vis_frame, label, (x, y-10), 
+                       cv2.FONT_HERSHEY_SIMPLEX, 0.6, (255, 0, 0), 2)
+        
+        # Add wagon count
+        cv2.putText(vis_frame, f"Wagons: {num_wagons}", (10, 70), 
+                   cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
+        
+        # Calculate processing time
+        processing_time = time.time() - start_time
+        fps = 1.0 / processing_time if processing_time > 0 else 0
+        
+        # Add FPS
+        cv2.putText(vis_frame, f"FPS: {fps:.1f}", (10, 110), 
+                   cv2.FONT_HERSHEY_SIMPLEX, 1, (255, 255, 0), 2)
+        
+        # Return results
+        return {
+            'camera_id': camera_id,
+            'is_blurred': is_blurred,
+            'blur_score': blur_score,
+            'was_deblurred': False,
+            'was_enhanced': False,
+            'num_wagons': num_wagons,
+            'wagon_ids': wagon_ids,
+            'wagons': wagons,
+            'tracked_wagons': tracked_wagons,
+            'processing_time': processing_time,
+            'fps': fps,
+            'visualization': vis_frame,
+            'timestamp': time.time()
+        }
+
+# For backward compatibility
+def process_frame(frame: np.ndarray, camera_id: str = "default") -> Dict:
+    """Standalone function to process a frame"""
+    pipeline = RailwayMonitoringPipeline()
+    return pipeline.process_frame(frame, camera_id)

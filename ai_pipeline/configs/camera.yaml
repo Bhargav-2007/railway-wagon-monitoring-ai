@@ -1,0 +1,56 @@
+# cat > ai_pipeline/configs/camera.yaml << 'EOF'
+# cameras:
+#   camera_1:
+#     name: "Entry Point Camera"
+#     url: "http://192.168.1.8:8080"
+#     position: "entry"
+#     fps: 30
+#     resolution:
+#       width: 1920
+#       height: 1080
+  
+#   camera_2:
+#     name: "Middle Section Camera"
+#     url: "http://192.168.1.8:8080"
+#     position: "middle"
+#     fps: 30
+#     resolution:
+#       width: 1920
+#       height: 1080
+  
+#   camera_3:
+#     name: "Exit Inspection Camera"
+#     url: "http://192.168.1.8:8080"
+#     position: "exit"
+#     fps: 30
+#     resolution:
+#       width: 1920
+#       height: 1080
+
+# stream_settings:
+#   buffer_size: 10
+#   timeout_seconds: 5
+#   reconnect_attempts: 3
+#   save_raw_frames: false
+# EOF
+
+# echo "✅ Camera configuration created"
+
+cameras:
+  camera_1:
+    name: "Primary Camera"
+    url: "http://192.168.1.8:8080"  # ← PUT YOUR ACTUAL IP HERE
+    position: "main"
+    fps: 30
+    resolution:
+      width: 1920
+      height: 1080
+
+stream_settings:
+  buffer_size: 10
+  timeout_seconds: 5
+  reconnect_attempts: 3
+  save_raw_frames: false
+
+# NOTE: Additional cameras (camera_2, camera_3) will be added during hackathon
+# For development, single camera is sufficient

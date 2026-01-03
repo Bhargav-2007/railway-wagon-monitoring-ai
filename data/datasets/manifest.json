@@ -1,0 +1,14 @@
+{
+  "created_at": "2026-01-03T15:20:01.151195",
+  "structure": {
+    "blur_detection": "Binary classification (sharp/blurred)",
+    "deblurring": "Image restoration (blurred -> sharp pairs)",
+    "ocr": "Wagon number plate recognition",
+    "wagon_detection": "Object detection (bounding boxes)"
+  },
+  "formats": {
+    "blur_detection": "Images in train/val folders with class labels",
+    "deblurring": "Paired blurred/sharp images",
+    "wagon_detection": "YOLO format (images + txt labels)"
+  }
+}

@@ -1,0 +1,24 @@
+model:
+  type: "hybrid"
+  classical_threshold: 100.0
+  cnn_model_path: "ai_pipeline/blur_detection/models/blur_classifier.pth"
+  input_size: 224
+  confidence_threshold: 0.7
+
+metrics:
+  - laplacian_variance
+  - sobel_gradient
+  - fft_frequency
+
+preprocessing:
+  grayscale: true
+  normalize: true
+  resize: [224, 224]
+
+training:
+  epochs: 50
+  batch_size: 32
+  learning_rate: 0.001
+  optimizer: "adam"
+  loss: "binary_crossentropy"
+  validation_split: 0.2

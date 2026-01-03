@@ -1,0 +1,31 @@
+model:
+  architecture: "nafnet"
+  width: 32
+  num_blocks: [4, 6, 6, 8]
+  drop_path_rate: 0.1
+  pretrained: false
+  checkpoint_path: "ai_pipeline/deblurring/models/nafnet_deblur.pth"
+
+training:
+  epochs: 200
+  batch_size: 4
+  learning_rate: 0.0001
+  scheduler: "cosine"
+  warmup_epochs: 5
+  patch_size: 256
+
+loss:
+  perceptual_weight: 0.1
+  l1_weight: 1.0
+  ssim_weight: 0.2
+
+augmentation:
+  random_crop: true
+  horizontal_flip: true
+  rotation: true
+  color_jitter: false
+
+inference:
+  tile_size: 512
+  tile_overlap: 32
+  batch_mode: false

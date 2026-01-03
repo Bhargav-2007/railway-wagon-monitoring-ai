@@ -1,0 +1,25 @@
+detection:
+  model: "paddleocr"
+  det_model_path: "paddleocr_det"
+  score_threshold: 0.5
+  nms_threshold: 0.3
+
+recognition:
+  model: "paddleocr"
+  rec_model_path: "paddleocr_rec"
+  dictionary: "en_dict.txt"
+  batch_size: 16
+
+preprocessing:
+  resize_height: 32
+  max_width: 320
+  normalize: true
+
+postprocessing:
+  min_confidence: 0.6
+  filter_special_chars: true
+  allowed_chars: "ABCDEFGHIJKLMNOPQRSTUVWXYZ0123456789-"
+  wagon_id_pattern: "^[A-Z]{2,4}[0-9]{4,8}$"
+
+roi:
+  wagon_number_region: [0.1, 0.3, 0.9, 0.6]

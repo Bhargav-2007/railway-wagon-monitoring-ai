@@ -1,0 +1,272 @@
+"""
+Real-time processing pipeline
+Integrates all AI modules for wagon monitoring
+"""
+
+import sys
+from pathlib import Path
+
+# Add project root to Python path
+project_root = Path(__file__).parent.parent.parent
+sys.path.insert(0, str(project_root))
+
+import cv2
+import numpy as np
+from typing import Dict, Optional
+import time
+
+from ai_pipeline.blur_detection.infer import BlurDetectionInference
+from ai_pipeline.deblurring.infer import DeblurInference
+from ai_pipeline.low_light_enhancement.infer import LowLightEnhancer
+from ai_pipeline.downstream_tasks.ocr.infer import OCRPipeline
+from ai_pipeline.downstream_tasks.wagon_counting.detector import WagonDetector
+from ai_pipeline.downstream_tasks.wagon_counting.tracker import WagonTracker
+
+
+class RailwayMonitoringPipeline:
+    """Complete end-to-end pipeline"""
+    
+    def __init__(self, device: str = "cpu"):
+        """Initialize all modules"""
+        print("Initializing Railway Monitoring Pipeline...\n")
+        
+        try:
+            self.blur_detector = BlurDetectionInference(device=device)
+            print("  ✓ Blur detector")
+        except Exception as e:
+            print(f"  ⚠ Blur detector: {e}")
+            self.blur_detector = None
+        
+        try:
+            self.deblurrer = DeblurInference(device=device)
+            print("  ✓ Deblurring model")
+        except Exception as e:
+            print(f"  ⚠ Deblurring: {e}")
+            self.deblurrer = None
+        
+        try:
+            self.enhancer = LowLightEnhancer(device=device)
+            print("  ✓ Low-light enhancer")
+        except Exception as e:
+            print(f"  ⚠ Low-light enhancer: {e}")
+            self.enhancer = None
+        
+        try:
+            self.ocr = OCRPipeline()
+            print("  ✓ OCR pipeline")
+        except Exception as e:
+            print(f"  ⚠ OCR: {e}")
+            self.ocr = None
+        
+        try:
+            self.wagon_detector = WagonDetector()
+            self.tracker = WagonTracker()
+            print("  ✓ Wagon detector & tracker")
+        except Exception as e:
+            print(f"  ⚠ Wagon detection: {e}")
+            self.wagon_detector = None
+            self.tracker = None
+        
+        print("\n✓ Pipeline initialized\n")
+    
+    def process_frame(self, frame: np.ndarray, skip_heavy: bool = False) -> Dict:
+        """
+        Process single frame through complete pipeline
+        
+        Args:
+            frame: Input frame (BGR)
+            skip_heavy: Skip heavy processing (deblur, enhance) for speed
+            
+        Returns:
+            Dictionary with all results
+        """
+        start_time = time.time()
+        results = {'original_frame': frame.copy()}
+        processed_frame = frame.copy()
+        
+        # Stage 1: Blur Detection
+        if self.blur_detector:
+            try:
+                blur_result = self.blur_detector.detect_blur(frame, method="classical")
+                results['blur'] = {
+                    'is_blurred': blur_result['is_blurred'],
+                    'score': blur_result['classical_score']
+                }
+                
+                # Stage 2: Deblurring (if needed and not skipping)
+                if blur_result['is_blurred'] and not skip_heavy and self.deblurrer:
+                    processed_frame = self.deblurrer.deblur(processed_frame)
+                    results['deblurred'] = True
+                else:
+                    results['deblurred'] = False
+            except Exception as e:
+                print(f"Blur detection error: {e}")
+                results['blur'] = {'is_blurred': False, 'score': 0}
+                results['deblurred'] = False
+        else:
+            results['blur'] = {'is_blurred': False, 'score': 0}
+            results['deblurred'] = False
+        
+        # Stage 3: Low-light Enhancement
+        if self.enhancer and not skip_heavy:
+            try:
+                if self.enhancer.is_low_light(processed_frame):
+                    processed_frame = self.enhancer.enhance(processed_frame)
+                    results['enhanced'] = True
+                else:
+                    results['enhanced'] = False
+            except Exception as e:
+                print(f"Enhancement error: {e}")
+                results['enhanced'] = False
+        else:
+            results['enhanced'] = False
+        
+        # Stage 4: Wagon Detection & Tracking
+        if self.wagon_detector and self.tracker:
+            try:
+                detections = self.wagon_detector.detect(processed_frame)
+                tracked = self.tracker.update(detections)
+                results['wagons'] = {
+                    'detected': len(detections),
+                    'tracked': tracked,
+                    'total_count': self.tracker.get_count()
+                }
+            except Exception as e:
+                print(f"Wagon detection error: {e}")
+                results['wagons'] = {'detected': 0, 'tracked': [], 'total_count': 0}
+        else:
+            results['wagons'] = {'detected': 0, 'tracked': [], 'total_count': 0}
+        
+        # Stage 5: OCR
+        if self.ocr:
+            try:
+                ocr_results = self.ocr.process_image(processed_frame)
+                results['ocr'] = ocr_results
+            except Exception as e:
+                print(f"OCR error: {e}")
+                results['ocr'] = {'wagon_ids': [], 'num_recognized': 0}
+        else:
+            results['ocr'] = {'wagon_ids': [], 'num_recognized': 0}
+        
+        # Total processing time
+        results['processing_time'] = time.time() - start_time
+        results['processed_frame'] = processed_frame
+        results['fps'] = 1.0 / results['processing_time']
+        
+        return results
+    
+    def visualize_results(self, frame: np.ndarray, results: Dict) -> np.ndarray:
+        """Draw all results on frame"""
+        vis = frame.copy()
+        h, w = vis.shape[:2]
+        
+        # Create semi-transparent overlay for info
+        overlay = vis.copy()
+        cv2.rectangle(overlay, (5, 5), (350, 150), (0, 0, 0), -1)
+        vis = cv2.addWeighted(overlay, 0.3, vis, 0.7, 0)
+        
+        # Info text
+        y_offset = 30
+        font = cv2.FONT_HERSHEY_SIMPLEX
+        font_scale = 0.6
+        thickness = 2
+        
+        # Blur status
+        blur_text = f"Blur: {'YES' if results['blur']['is_blurred'] else 'NO'} ({results['blur']['score']:.1f})"
+        cv2.putText(vis, blur_text, (10, y_offset), font, font_scale, (0, 255, 0), thickness)
+        y_offset += 25
+        
+        # Enhancement status
+        if results.get('deblurred'):
+            cv2.putText(vis, "Deblurred: YES", (10, y_offset), font, font_scale, (0, 255, 255), thickness)
+            y_offset += 25
+        if results.get('enhanced'):
+            cv2.putText(vis, "Enhanced: YES", (10, y_offset), font, font_scale, (0, 255, 255), thickness)
+            y_offset += 25
+        
+        # Wagon count
+        wagon_text = f"Wagons: {results['wagons']['total_count']}"
+        cv2.putText(vis, wagon_text, (10, y_offset), font, font_scale, (255, 100, 0), thickness)
+        y_offset += 25
+        
+        # Wagon IDs
+        wagon_ids = len(results['ocr']['wagon_ids'])
+        id_text = f"Wagon IDs: {wagon_ids}"
+        cv2.putText(vis, id_text, (10, y_offset), font, font_scale, (255, 100, 0), thickness)
+        y_offset += 25
+        
+        # FPS
+        fps_text = f"FPS: {results['fps']:.1f}"
+        cv2.putText(vis, fps_text, (10, y_offset), font, font_scale, (255, 255, 0), thickness)
+        
+        # Draw tracked wagons
+        for obj in results['wagons']['tracked']:
+            x1, y1, x2, y2 = obj['bbox']
+            track_id = obj['track_id']
+            
+            color = (0, 255, 0) if obj.get('new', False) else (255, 0, 255)
+            cv2.rectangle(vis, (x1, y1), (x2, y2), color, 2)
+            cv2.putText(vis, f"ID:{track_id}", (x1, y1-10), font, 0.5, color, 2)
+        
+        # Draw OCR results
+        if self.ocr:
+            try:
+                vis = self.ocr.visualize_results(vis, results['ocr'])
+            except:
+                pass
+        
+        return vis
+
+
+# Test
+if __name__ == "__main__":
+    import sys
+    
+    print("="*60)
+    print("RAILWAY WAGON MONITORING - COMPLETE PIPELINE TEST")
+    print("="*60 + "\n")
+    
+    pipeline = RailwayMonitoringPipeline(device="cpu")
+    
+    if len(sys.argv) > 1:
+        img_path = sys.argv[1]
+    else:
+        img_path = "test_frame_captured.jpg"
+    
+    frame = cv2.imread(img_path)
+    if frame is None:
+        print(f"Error: Cannot load {img_path}")
+        sys.exit(1)
+    
+    print(f"Processing: {img_path}")
+    print(f"Image size: {frame.shape[1]}x{frame.shape[0]}\n")
+    
+    # Process (skip heavy processing for speed test)
+    results = pipeline.process_frame(frame, skip_heavy=True)
+    
+    # Print results
+    print("="*60)
+    print("RESULTS")
+    print("="*60)
+    print(f"Blur Detected: {results['blur']['is_blurred']} (score: {results['blur']['score']:.1f})")
+    print(f"Deblurred: {results['deblurred']}")
+    print(f"Enhanced: {results['enhanced']}")
+    print(f"Wagons Detected: {results['wagons']['detected']}")
+    print(f"Total Wagon Count: {results['wagons']['total_count']}")
+    print(f"Wagon IDs Recognized: {len(results['ocr']['wagon_ids'])}")
+    if results['ocr']['wagon_ids']:
+        for wagon in results['ocr']['wagon_ids']:
+            print(f"  - {wagon['text']} (conf: {wagon['confidence']:.2f})")
+    print(f"Processing Time: {results['processing_time']:.2f}s")
+    print(f"FPS: {results['fps']:.1f}")
+    print("="*60)
+    
+    # Visualize
+    vis = pipeline.visualize_results(results['processed_frame'], results)
+    output_path = img_path.replace('.jpg', '_FINAL_RESULT.jpg')
+    cv2.imwrite(output_path, vis)
+    print(f"\n✅ Saved visualization: {output_path}")
+    
+    print("\n" + "="*60)
+    print("✅ PIPELINE TEST COMPLETED SUCCESSFULLY!")
+    print("="*60)

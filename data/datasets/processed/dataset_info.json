@@ -1,0 +1,25 @@
+{
+  "total_images": {
+    "blurred": 1151,
+    "sharp": 1151
+  },
+  "splits": {
+    "train": {
+      "blurred": 805,
+      "sharp": 805
+    },
+    "val": {
+      "blurred": 172,
+      "sharp": 172
+    },
+    "test": {
+      "blurred": 174,
+      "sharp": 174
+    }
+  },
+  "ratios": {
+    "train": 0.7,
+    "val": 0.15,
+    "test": 0.15
+  }
+}
