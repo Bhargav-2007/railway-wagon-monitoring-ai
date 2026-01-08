@@ -1,5 +1,5 @@
-import React, { useState, useEffect } from 'react';
-import StatCard from '../components/StatCard';
+import React, { useState } from 'react';
+import { MetricCard } from '../components/MetricCard';
 import CameraSection from '../components/CameraSection';
 import BlurDetectionTable from '../components/BlurDetectionTable';
 import AlertBanner from '../components/AlertBanner';
@@ -26,7 +26,7 @@ const Dashboard: React.FC = () => {
       <section className="stats-section">
         <div className="stats-grid">
           {stats.map((stat, index) => (
-            <StatCard key={index} {...stat} />
+            import Dashboard from './pages/Dashboard'<MetricCard key={index} {...stat} />
           ))}
         </div>
       </section>
