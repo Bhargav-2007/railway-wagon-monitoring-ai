@@ -1,0 +1,163 @@
+.
+├── README.md
+├── ai_pipeline
+│   ├── __init__.py
+│   ├── blur_detection
+│   │   ├── __init__.py
+│   │   ├── classical_metrics.py
+│   │   ├── cnn_model.py
+│   │   ├── infer.py
+│   │   ├── models
+│   │   └── train.py
+│   ├── configs
+│   │   ├── blur_detection.yaml
+│   │   ├── camera.yaml
+│   │   ├── deblurring.yaml
+│   │   ├── inference.yaml
+│   │   ├── low_light.yaml
+│   │   └── ocr.yaml
+│   ├── deblurring
+│   │   ├── __init__.py
+│   │   ├── infer.py
+│   │   ├── model.py
+│   │   └── train.py
+│   ├── downstream_tasks
+│   │   ├── __init__.py
+│   │   ├── damage_detection
+│   │   ├── ocr
+│   │   └── wagon_counting
+│   ├── ingestion
+│   │   ├── __init__.py
+│   │   ├── camera_stream.py
+│   │   ├── image_polling_stream.py
+│   │   ├── multi_camera_manager.py
+│   │   └── smart_camera_stream.py
+│   ├── low_light_enhancement
+│   │   ├── __init__.py
+│   │   ├── infer.py
+│   │   └── model.py
+│   ├── modules
+│   │   ├── __init__.py
+│   │   ├── blur_detection.py
+│   │   ├── blur_detection_old2.py
+│   │   ├── wagon_detection.py
+│   │   └── wagon_tracker.py
+│   ├── onnx
+│   │   └── __init__.py
+│   ├── pipelines
+│   │   ├── __init__.py
+│   │   ├── realtime_pipeline.py
+│   │   ├── realtime_pipeline.py.backup
+│   │   └── realtime_pipeline.py.backup2
+│   ├── tensorrt
+│   │   └── __init__.py
+│   └── utils
+│       └── __init__.py
+├── backend
+│   ├── __init__.py
+│   ├── alembic
+│   │   └── versions
+│   ├── app
+│   │   ├── __init__.py
+│   │   ├── api
+│   │   ├── camera_manager.py
+│   │   ├── core
+│   │   ├── database.py
+│   │   ├── db
+│   │   ├── main.py
+│   │   ├── main.py.backup
+│   │   ├── main.py.backup2
+│   │   ├── main.py.broken
+│   │   ├── middleware
+│   │   ├── models
+│   │   ├── schemas
+│   │   ├── services
+│   │   ├── utils
+│   │   └── workers
+│   ├── components
+│   │   ├── auth
+│   │   ├── emergency
+│   │   └── layout
+│   ├── hooks
+│   ├── pages
+│   │   ├── admin
+│   │   ├── auth
+│   │   ├── maintenance
+│   │   └── station
+│   ├── railway_monitor.db
+│   ├── railway_monitoring.db
+│   ├── requirements.txt
+│   ├── stores
+│   ├── types
+│   └── utils
+├── calibrate_threshold.py
+├── camera_config.json
+├── data
+│   └── datasets
+│       ├── manifest.json
+│       └── processed
+├── demo_report.json
+├── docs
+│   ├── api
+│   ├── architecture
+│   └── deployment
+├── frontend
+│   ├── README.md
+│   ├── package-lock.json
+│   ├── package.json
+│   ├── postcss.config.js
+│   ├── public
+│   │   ├── favicon.ico
+│   │   ├── index.html
+│   │   ├── manifest.json
+│   │   └── robots.txt
+│   ├── src
+│   │   ├── App.css
+│   │   ├── App.test.tsx
+│   │   ├── App.tsx
+│   │   ├── api
+│   │   ├── components
+│   │   ├── hooks
+│   │   ├── index.css
+│   │   ├── index.tsx
+│   │   ├── logo.svg
+│   │   ├── pages
+│   │   ├── react-app-env.d.ts
+│   │   ├── reportWebVitals.ts
+│   │   ├── setupTests.ts
+│   │   ├── stores
+│   │   ├── types
+│   │   └── utils
+│   ├── tailwind.config.js
+│   ├── tailwind.config.js.save
+│   └── tsconfig.json
+├── migrations
+│   └── versions
+├── monitoring
+│   ├── alerts
+│   └── grafana
+│       └── dashboards
+├── package-lock.json
+├── package.json
+├── postcss.config.js
+├── project_structure.txt
+├── public
+│   └── sounds
+├── restart_backend.sh
+├── scripts
+│   ├── demo_system.py
+│   ├── fix_imports.py
+│   ├── organize_blur_dataset.py
+│   ├── prepare_dataset.py
+│   ├── setup
+│   ├── test_all_modules.sh
+│   ├── test_trained_model.py
+│   └── validate_configs.py
+├── setup_cameras.py
+├── structure.txt
+├── tailwind.config.js
+├── test_blur_now.py
+├── test_both_images.py
+└── tests
+
+71 directories, 90 files

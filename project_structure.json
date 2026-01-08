@@ -1,0 +1,243 @@
+{
+  "README.md": "FILE",
+  "ai_pipeline/": {
+    "__init__.py": "FILE",
+    "blur_detection/": {
+      "__init__.py": "FILE",
+      "classical_metrics.py": "FILE",
+      "cnn_model.py": "FILE",
+      "infer.py": "FILE",
+      "models/": {
+        "blur_classifier_best.pth": "FILE"
+      },
+      "train.py": "FILE"
+    },
+    "configs/": {
+      "blur_detection.yaml": "FILE",
+      "camera.yaml": "FILE",
+      "deblurring.yaml": "FILE",
+      "inference.yaml": "FILE",
+      "low_light.yaml": "FILE",
+      "ocr.yaml": "FILE"
+    },
+    "deblurring/": {
+      "__init__.py": "FILE",
+      "infer.py": "FILE",
+      "model.py": "FILE",
+      "train.py": "FILE"
+    },
+    "downstream_tasks/": {
+      "__init__.py": "FILE",
+      "damage_detection/": {
+        "__init__.py": "FILE"
+      },
+      "ocr/": {
+        "__init__.py": "FILE",
+        "infer.py": "FILE",
+        "recognizer.py": "FILE",
+        "text_detector.py": "FILE"
+      },
+      "wagon_counting/": {
+        "__init__.py": "FILE",
+        "detector.py": "FILE",
+        "tracker.py": "FILE"
+      }
+    },
+    "ingestion/": {
+      "__init__.py": "FILE",
+      "camera_stream.py": "FILE",
+      "image_polling_stream.py": "FILE",
+      "multi_camera_manager.py": "FILE",
+      "smart_camera_stream.py": "FILE"
+    },
+    "low_light_enhancement/": {
+      "__init__.py": "FILE",
+      "infer.py": "FILE",
+      "model.py": "FILE"
+    },
+    "modules/": {
+      "__init__.py": "FILE",
+      "blur_detection.py": "FILE",
+      "blur_detection_old2.py": "FILE",
+      "wagon_detection.py": "FILE",
+      "wagon_tracker.py": "FILE"
+    },
+    "onnx/": {
+      "__init__.py": "FILE"
+    },
+    "pipelines/": {
+      "__init__.py": "FILE",
+      "realtime_pipeline.py": "FILE",
+      "realtime_pipeline.py.backup": "FILE",
+      "realtime_pipeline.py.backup2": "FILE"
+    },
+    "tensorrt/": {
+      "__init__.py": "FILE"
+    },
+    "utils/": {
+      "__init__.py": "FILE"
+    }
+  },
+  "backend/": {
+    "__init__.py": "FILE",
+    "alembic/": {
+      "versions/": {}
+    },
+    "app/": {
+      "__init__.py": "FILE",
+      "api/": {
+        "__init__.py": "FILE",
+        "v1/": {
+          "__init__.py": "FILE",
+          "analytics.py": "FILE",
+          "frames.py": "FILE",
+          "health.py": "FILE",
+          "stream.py": "FILE"
+        }
+      },
+      "camera_manager.py": "FILE",
+      "core/": {
+        "__init__.py": "FILE",
+        "config.py": "FILE"
+      },
+      "database.py": "FILE",
+      "db/": {
+        "__init__.py": "FILE",
+        "base.py": "FILE",
+        "models.py": "FILE",
+        "schemas.py": "FILE",
+        "session.py": "FILE"
+      },
+      "main.py": "FILE",
+      "main.py.backup": "FILE",
+      "main.py.backup2": "FILE",
+      "main.py.broken": "FILE",
+      "middleware/": {},
+      "models/": {
+        "__init__.py": "FILE",
+        "frame.py": "FILE"
+      },
+      "schemas/": {},
+      "services/": {
+        "__init__.py": "FILE"
+      },
+      "utils/": {},
+      "workers/": {
+        "__init__.py": "FILE"
+      }
+    },
+    "components/": {
+      "auth/": {},
+      "emergency/": {},
+      "layout/": {}
+    },
+    "hooks/": {},
+    "pages/": {
+      "admin/": {},
+      "auth/": {},
+      "maintenance/": {},
+      "station/": {}
+    },
+    "railway_monitor.db": "FILE",
+    "railway_monitoring.db": "FILE",
+    "requirements.txt": "FILE",
+    "stores/": {},
+    "types/": {},
+    "utils/": {}
+  },
+  "calibrate_threshold.py": "FILE",
+  "camera_config.json": "FILE",
+  "data/": {
+    "datasets/": {
+      "manifest.json": "FILE",
+      "processed/": {
+        "dataset_info.json": "FILE"
+      }
+    }
+  },
+  "demo_report.json": "FILE",
+  "docs/": {
+    "api/": {},
+    "architecture/": {},
+    "deployment/": {}
+  },
+  "frontend/": {
+    "README.md": "FILE",
+    "package-lock.json": "FILE",
+    "package.json": "FILE",
+    "postcss.config.js": "FILE",
+    "public/": {
+      "favicon.ico": "FILE",
+      "index.html": "FILE",
+      "manifest.json": "FILE",
+      "robots.txt": "FILE"
+    },
+    "src/": {
+      "App.css": "FILE",
+      "App.test.tsx": "FILE",
+      "App.tsx": "FILE",
+      "api/": {
+        "railwayApi.ts": "FILE"
+      },
+      "components/": {
+        "CameraGrid.tsx": "FILE",
+        "Card.tsx": "FILE",
+        "MetricCard.tsx": "FILE",
+        "UploadZone.tsx": "FILE",
+        "layout/": {}
+      },
+      "hooks/": {},
+      "index.css": "FILE",
+      "index.tsx": "FILE",
+      "logo.svg": "FILE",
+      "pages/": {
+        "Dashboard.backup.tsx": "FILE",
+        "Dashboard.tsx": "FILE",
+        "admin/": {}
+      },
+      "react-app-env.d.ts": "FILE",
+      "reportWebVitals.ts": "FILE",
+      "setupTests.ts": "FILE",
+      "stores/": {},
+      "types/": {},
+      "utils/": {}
+    },
+    "tailwind.config.js": "FILE",
+    "tailwind.config.js.save": "FILE",
+    "tsconfig.json": "FILE"
+  },
+  "migrations/": {
+    "versions/": {}
+  },
+  "monitoring/": {
+    "alerts/": {},
+    "grafana/": {
+      "dashboards/": {}
+    }
+  },
+  "package-lock.json": "FILE",
+  "package.json": "FILE",
+  "postcss.config.js": "FILE",
+  "project_structure.json": "FILE",
+  "project_structure.txt": "FILE",
+  "public/": {
+    "sounds/": {}
+  },
+  "restart_backend.sh": "FILE",
+  "scripts/": {
+    "demo_system.py": "FILE",
+    "fix_imports.py": "FILE",
+    "organize_blur_dataset.py": "FILE",
+    "prepare_dataset.py": "FILE",
+    "setup/": {},
+    "test_all_modules.sh": "FILE",
+    "test_trained_model.py": "FILE",
+    "validate_configs.py": "FILE"
+  },
+  "setup_cameras.py": "FILE",
+  "structure.txt": "FILE",
+  "tailwind.config.js": "FILE",
+  "test_blur_now.py": "FILE",
+  "test_both_images.py": "FILE",
+  "tests/": {}
+}
