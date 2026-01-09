@@ -10,11 +10,10 @@ const Dashboard: React.FC = () => {
   const [selectedImage, setSelectedImage] = useState(0);
 
   const stats = [
-    { label: 'Total Wagons', value: '2,847', change: '+12.5%', icon: '🚂' },
-    { label: 'Blur Detected', value: '34', change: '-5.2%', icon: '⚠️' },
-    { label: 'Avg Score', value: '94.2%', change: '+2.1%', icon: '✓' },
-    { label: 'Active Routes', value: '156', change: '+8.3%', icon: '🛤️' },
-  ];
+    { label: 'Total Wagons', value: '2,847',  title: 'Total Wagons',change: '+12.5%', icon: '🚂' },
+    { label: 'Blur Detected', value: '34', title: 'Blur Detected', change: '-5.2%', icon: '⚠️' },
+    { label: 'Avg Score', value: '94.2%', title: 'Avg Score', change: '+2.1%', icon: '✓' },
+    { label: 'Active Routes', value: '156', title: 'Active Routes', change: '+8.3%', icon: '🚆' },  ];
 
   return (
     <div className="dashboard">
@@ -26,7 +25,7 @@ const Dashboard: React.FC = () => {
       <section className="stats-section">
         <div className="stats-grid">
           {stats.map((stat, index) => (
-            import Dashboard from './pages/Dashboard'<MetricCard key={index} {...stat} />
+            <MetricCard key={index} {...stat} />
           ))}
         </div>
       </section>
